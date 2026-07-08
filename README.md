@@ -6,8 +6,8 @@
 * The MCP server uses **FastMCP** to create an MCP service for PC status monitoring.
 * **n8n** uses the **Google Gemini AI Agent** to process user inputs and send emails. The AI Agent uses the **MCP client** to fetch PC status details from the MCP server.
 
-![n8n testing](system_architecture.png)
-
+![n8n testing](image/system_architecture.png)
+![result](image/result.png)
 ## Workflow
 
 1. When a user sends a chat message to n8n, the workflow is triggered.
