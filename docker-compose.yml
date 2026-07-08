@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # 1. 你的 MCP 監控服務
+  mcp-server:
+    build: ./mcp-server        # 告訴 Docker 去這個資料夾找 Dockerfile 來編譯
+    container_name: PC-monitor-mcp-server
+    ports:
+      - "8888:8888"
+    pid: "host"                # 關鍵：允許 Python 抓到 Windows 宿主機的真實硬體數據
+    restart: unless-stopped
+    networks:
+      - monitor-network         # 建立共同網路
+
+  # 2. n8n 自動化服務
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:latest
+    container_name: my-n8n
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY} # 從同目錄下的 .env 檔案中讀取
+    restart: unless-stopped
+    volumes:
+      - n8n_data:/home/node/.n8n # 讓 n8n 的工作流設定可以存檔，不會因為容器重啟而消失
+    networks:
+      - monitor-network         # 綁定在同一個共同網路
+    depends_on:
+      - mcp-server              # 確保 MCP 先啟動，n8n 再啟動
+
+# 定義共同網路
+networks:
+  monitor-network:
+    driver: bridge
+
+# 定義 n8n 的資料持久化儲存卷
+volumes:
+  n8n_data:
